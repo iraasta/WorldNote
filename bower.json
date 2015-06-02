@@ -6,7 +6,5 @@
   },
   "dependencies": {
     "ng-cordova-oauth": "~0.1.2",
-    "facebook-connect-plugin": "https://cdn.rawgit.com/Wizcorp/phonegap-facebook-plugin/master/facebookConnectPlugin.js"
-
   }
 }

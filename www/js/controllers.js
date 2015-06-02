@@ -1,68 +1,29 @@
-angular.module('starter.controllers',[])
+angular.module('starter.controllers',['starter.services', 'ngOpenFB'])
 
-  .controller('DashCtrl', function ($scope, $cordovaFacebook) {
-    $cordovaFacebook.login(["public_profile", "email", "user_friends"])
-      .then(function(success) {
-        console.log("success" + success)
-        // { id: "634565435",
-        //   lastName: "bob"
-        //   ...
-        // }
-      }, function (error) {
-        // error
-      });
-
-
-    var options = {
-      method: "feed",
-      link: "http://example.com",
-      caption: "Such caption, very feed."
-    };
-    $cordovaFacebook.showDialog(options)
-      .then(function(success) {
-        // success
-      }, function (error) {
-        // error
-      });
-
-
-    $cordovaFacebook.api("me", ["public_profile"])
-      .then(function(success) {
-        // success
-      }, function (error) {
-        // error
-      });
-
-
-    $cordovaFacebook.getLoginStatus()
-      .then(function(success) {
-        /*
-         { authResponse: {
-         userID: "12345678912345",
-         accessToken: "kgkh3g42kh4g23kh4g2kh34g2kg4k2h4gkh3g4k2h4gk23h4gk2h34gk234gk2h34AndSoOn",
-         session_Key: true,
-         expiresIn: "5183738",
-         sig: "..."
-         },
-         status: "connected"
-         }
-         */
-      }, function (error) {
-        // error
-      });
-
-    $cordovaFacebook.getAccessToken()
-      .then(function(success) {
-        // success
-      }, function (error) {
-        // error
-      });
-
-    $cordovaFacebook.logout()
-      .then(function(success) {
-        // success
-      }, function (error) {
-        // error
+  .controller('DashCtrl', function ($scope, ngFB) {
+    $scope.fbLogin = function() {
+      ngFB.login({scope: 'email,name,id,read_stream,publish_actions'}).then(
+        function (response) {
+          if (response.status === 'connected') {
+            var token = response.authResponse.accessToken;
+            window.localStorage.setItem("token", token);
+            window.disconnected = (status.status != "connected")
+          } else {
+            alert('Facebook login failed');
+          }
+        });
+    }
+    ngFB.api({
+      path: '/me',
+      params: {fields: 'id,name'}
+    }).then(
+      function (user) {
+        console.log("Got info")
+        console.log(user)
+        $scope.user = user;
+      },
+      function (error) {
+        alert('Facebook error: ' + error.error_description);
       });
   })
 
@@ -150,3 +111,15 @@ angular.module('starter.controllers',[])
       enableFriends: true
     };
   })
+  .controller('ProfileCtrl', function ($scope, ngFB) {
+    ngFB.api({
+      path: '/me',
+      params: {fields: 'id,name'}
+    }).then(
+      function (user) {
+        $scope.user = user;
+      },
+      function (error) {
+        alert('Facebook error: ' + error.error_description);
+      });
+  });

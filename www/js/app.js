@@ -5,11 +5,15 @@
 // the 2nd parameter is an array of 'requires'
 // 'starter.services' is found in services.js
 // 'starter.controllers' is found in controllers.js
-angular.module('starter', ['ionic', 'ngCordova' , 'ngCordovaOauth', 'uiGmapgoogle-maps', 'starter.controllers', 'starter.services',"ngMap"])
+angular.module('starter', ['ionic' , 'ngOpenFB', 'uiGmapgoogle-maps', 'starter.controllers', 'starter.services',"ngMap"])
 
-.run(function($ionicPlatform ) {
+.run(function($ionicPlatform, ngFB) {
+    var token = window.localStorage.getItem("token");
+    ngFB.init({appId: '761259930653682', accessToken: token, tokenStore: {}});
+    ngFB.getLoginStatus().then(function(status){
+      window.disconnected = (status.status != "connected")
+    });
     $ionicPlatform.ready(function() {
-
     // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
     // for form inputs)
     if (window.cordova && window.cordova.plugins && window.cordova.plugins.Keyboard) {
@@ -22,11 +26,7 @@ angular.module('starter', ['ionic', 'ngCordova' , 'ngCordovaOauth', 'uiGmapgoogl
   });
 })
 
-.config(function($stateProvider, $urlRouterProvider, $cordovaFacebookProvider) {
-    var appID = 761259930653682;
-    var version = "v2.0"; // or leave blank and default is v2.0
-    console.log($cordovaFacebookProvider)
-    $cordovaFacebookProvider.browserInit(appID, version);
+.config(function($stateProvider, $urlRouterProvider) {
   // Ionic uses AngularUI Router which uses the concept of states
   // Learn more here: https://github.com/angular-ui/ui-router
   // Set up the various states which the app can be in.
@@ -79,7 +79,16 @@ angular.module('starter', ['ionic', 'ngCordova' , 'ngCordovaOauth', 'uiGmapgoogl
         controller: 'AccountCtrl'
       }
     }
-  });
+  })
+  .state('app.profile', {
+      url: "/profile",
+      views: {
+        'menuContent': {
+          templateUrl: "templates/profile.html",
+          controller: "ProfileCtrl"
+        }
+      }
+    })
 
   // if none of the above states are matched, use this as the fallback
   $urlRouterProvider.otherwise('/tab/dash');
